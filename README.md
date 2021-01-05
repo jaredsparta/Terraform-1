@@ -21,6 +21,18 @@
 
 <br>
 
+## Main Commands
+- As can be seen when typing `terraform -help`, the main commands are:
+    1. `init` - prepares working directory for the other commands
+    2. `validate` - checks if the configuration file is valid
+    3. `plan` - will show what will change in the infrastructure after applying
+    4. `apply` - creates or updates infrastructure
+    5. `destroy` - destroys previously-created infrastructure
+
+- There are other CLI commands you can use which can be seen using `terraform -help`
+
+<br>
+
 ## Examples
 - In the following, the AMI's used are already provisioned to run the app and the database (via Packer and Ansible)
 
