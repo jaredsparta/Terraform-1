@@ -35,6 +35,26 @@
 
 ## Examples
 - In the following, the AMI's used are already provisioned to run the app and the database (via Packer and Ansible)
+- The following examples use variables named within a separate `.tf` file. As the variables contain sensitive information (personal IP's etc.) they were omitted. You will have to use the following structure to create your own file:
+    - Create a file named `variables.tf` (it can be named however you want as long as the file extension is `.tf`)
+    - Inside this file write the following:
+    ```tf
+    variable "ami" {
+    type = map
+    default = {
+        "app" = "<ami-id>"
+        "db" = "<ami-id>"
+        }
+    }
+
+    variable "personal" {
+        type = map
+        default = {
+            "key" = "<key-name>"
+            "ip" = "<personal-ip>/32"
+        }
+    }
+    ```
 
 <br>
 
@@ -47,7 +67,7 @@ resource "aws_instance" "nodejs_instance" {
     ami = var.ami["app"]
     instance_type = "t2.micro"
     associate_public_ip_address = true
-    key_name = var.keys["jared"]
+    key_name = var.personal["key"]
     vpc_security_group_ids = [ aws_security_group.appSG.id ]
     tags = {
       "Name" = "eng74-jared-terraform-app"
@@ -71,7 +91,7 @@ resource "aws_security_group" "dbSG" {
         from_port = 27017
         to_port = 27017
         protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = [ aws_security_group.appSG.id ]
     }
 
     ingress {
@@ -79,14 +99,15 @@ resource "aws_security_group" "dbSG" {
         from_port = 22
         to_port = 22
         protocol = "tcp"
-        security_groups = [aws_security_group.appSG.id]
+        cidr_blocks = [ var.personal["ip"] ]
     }
 
     egress {
+        description = "outbound with no restrictions"
         from_port   = 0
         to_port     = 0
         protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = [ "0.0.0.0/0" ]
     }
 }
 ```
@@ -127,7 +148,7 @@ variable "ami" {
 ```tf
 resource "aws_security_group" "appSG" {
     name = "eng74.jared.SG.app.terraform"
-    description = "allows access to app from port 80 anywhere"
+    description = "the security group for the app via terraform"
 
     ingress {
         description = "port 80 access anywhere"
@@ -142,10 +163,11 @@ resource "aws_security_group" "appSG" {
         from_port = 22
         to_port = 22
         protocol = "tcp"
-        cidr_blocks = ["95.147.237.10/32"]
+        cidr_blocks = [ var.personal["ip"] ]
     }
 
     egress {
+        description = "outbound with no restrictions"
         from_port   = 0
         to_port     = 0
         protocol    = "-1"
@@ -153,12 +175,11 @@ resource "aws_security_group" "appSG" {
     }
 }
 
-
 resource "aws_instance" "nodejs_instance" {
     ami = var.ami["app"]
     instance_type = "t2.micro"
     associate_public_ip_address = true
-    key_name = var.keys["jared"]
+    key_name = var.personal["key"]
     vpc_security_group_ids = [ aws_security_group.appSG.id ]
     tags = {
       "Name" = "eng74-jared-terraform-app"
@@ -170,7 +191,10 @@ resource "aws_instance" "nodejs_instance" {
 
 ### What's next?
 - Find a way to update the `DB_HOST` environment variable when creating the app instance so that it automatically connects to the newly-created database instance
+- Use Terraform to create a separate VPC and subnets inside it while configuring the necessary IGW's, Route Tables etc.
+- Create a Bastion server so the database is more secure
 
+<br>
 
 ---
 **Used:**
