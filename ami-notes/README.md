@@ -46,14 +46,13 @@
 - Iteration 2:
 ```json
 {
-////// NEW CODE
+// NEW CODE
 // We can reference environment variables in json through the env keyword
 // The referencing is identical to Jinja2, i.e. the double curly braces
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY`}}",
     "aws_secret_key": "{{env `AWS_SECRET_KEY`}}"
   },
-//
 
   "builders": [{
       "type": "amazon-ebs",
@@ -253,8 +252,8 @@
       "playbook_file": "./app_playbook.yml"
      },
 
-/////// NEW CODE
-/////// This will save the current pm2 processes and ensures they startup/reload when an instance is created
+// NEW CODE
+// This will save the current pm2 processes and ensures they startup/reload when an instance is created
      {
       "type": "shell",
       "inline": ["sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu", "pm2 save"]

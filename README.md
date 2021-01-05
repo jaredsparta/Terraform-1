@@ -24,7 +24,7 @@ resource "aws_instance" "nodejs_instance" {
     instance_type = "t2.micro"
     associate_public_ip_address = true
     key_name = var.keys["jared"]
-    vpc_security_group_ids = [ "${aws_security_group.appSG.id}" ]
+    vpc_security_group_ids = [ aws_security_group.appSG.id ]
     tags = {
       "Name" = "eng74-jared-terraform-app"
     }
@@ -55,7 +55,7 @@ resource "aws_security_group" "dbSG" {
         from_port = 22
         to_port = 22
         protocol = "tcp"
-        security_groups = ["${aws_security_group.appSG.id}"]
+        security_groups = [aws_security_group.appSG.id]
     }
 
     egress {
@@ -90,12 +90,15 @@ variable "ami" {
 - One can also use the outputs from previous tasks
 - For instance, `main.tf` will create two security groups first. We can then use these newly created security groups as the groups for the EC2 instances that will be created -- all within the same command. How?
     - For any resource, we can call it's variables via `<resource-name>.<identifier>.<variable>`
+- Why do it this way?
+    - This will save a lot of time as one will no longer need to manually add a security group in AWS
+
 
 - Example:
     1. The first resource called `appSG` creates the security group for our app instance
     2. Of course since this is a newly-created SG we won't have it's ID to input into the `.tf` file
     3. We can still associate this SG with our app by using the output of it's resource
-    4. As one can see in the second resource, the security group that is associated with the app instance is `"${aws_security_group.appSG.id}"` which references the security group ID that the first resource will have once created
+    4. One can see that in the second resource, the security group being associated to the app is `aws_security_group.appSG.id`, which references the ID of the security group that the first resource creates
 
 ```tf
 resource "aws_security_group" "appSG" {
@@ -132,12 +135,18 @@ resource "aws_instance" "nodejs_instance" {
     instance_type = "t2.micro"
     associate_public_ip_address = true
     key_name = var.keys["jared"]
-    vpc_security_group_ids = [ "${aws_security_group.appSG.id}" ]
+    vpc_security_group_ids = [ aws_security_group.appSG.id ]
     tags = {
       "Name" = "eng74-jared-terraform-app"
     }
 }
 ```
+
+<br>
+
+### What's next?
+- Find a way to update the `DB_HOST` environment variable when creating the app instance so that it automatically connects to the newly-created database instance
+
 
 ---
 **Used:**

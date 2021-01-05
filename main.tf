@@ -51,7 +51,7 @@ resource "aws_security_group" "dbSG" {
         from_port = 22
         to_port = 22
         protocol = "tcp"
-        security_groups = ["${aws_security_group.appSG.id}"]
+        security_groups = [aws_security_group.appSG.id]
     }
 
     egress {
@@ -68,7 +68,7 @@ resource "aws_instance" "nodejs_instance" {
     instance_type = "t2.micro"
     associate_public_ip_address = true
     key_name = var.keys["jared"]
-    vpc_security_group_ids = [ "${aws_security_group.appSG.id}" ]
+    vpc_security_group_ids = [ aws_security_group.appSG.id ]
     tags = {
       "Name" = "eng74-jared-terraform-app"
     }
@@ -80,7 +80,7 @@ resource "aws_instance" "mongodb_instance" {
     instance_type = "t2.micro"
     associate_public_ip_address = true
     key_name = var.keys["jared"]
-    vpc_security_group_ids = [ "${aws_security_group.dbSG.id}" ]
+    vpc_security_group_ids = [ aws_security_group.dbSG.id ]
     tags = {
       "Name" = "eng74-jared-terraform-db"
     }
