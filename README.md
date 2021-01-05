@@ -2,10 +2,22 @@
 
 ![](images/diagram.jpg)
 
+<br>
+
+## What is Terraform
+- Terraform is a tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.
+- The infrastructure Terraform can manage includes low-level components such as compute instances, storage, and networking, as well as high-level components such as DNS entries, SaaS features, etc.
+
+[Source](https://www.terraform.io/intro/index.html)
+
+
+<br>
+
 ## Why Terraform
 
 - It is agentless so there is no need to install any extra agents apart from Terraform itself
 - It is declarative so all you need to do is declare what state you want the infrastructure and Terraform will do the rest for you
+- It is cloud-independent, we can use Terraform for AWS, Azure, etc. 
 
 <br>
 
