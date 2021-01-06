@@ -1,4 +1,7 @@
 .terraform/*
+.terraform
 .vscode
 terraform*
-vars.tf
+*/.terraform*
+*/variables.tf
+!terraform-files

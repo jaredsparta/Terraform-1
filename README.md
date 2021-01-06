@@ -28,6 +28,7 @@
     3. `plan` - will show what will change in the infrastructure after applying
     4. `apply` - creates or updates infrastructure
     5. `destroy` - destroys previously-created infrastructure
+    6. `refresh` - used to reconcile the state Terraform knows about (via its state file) with the real-world infrastructure
 
 - There are other CLI commands you can use which can be seen using `terraform -help`
 
@@ -218,8 +219,20 @@ resource "aws_instance" "nodejs_instance" {
 
 <br>
 
+### VPCs, subnets and more infrastructure
+- We now want to create our own VPC alongside a private and public subnet. We also want to create the necessary infrastructure (route tables, network ACLs etc.)
+
+- The code is split up among several files in `terraform-files`. The resources used were:
+    - `aws_vpc`
+    - `aws_subnet`
+    - `aws_internet_gateway`
+    - `aws_route_table` and `aws_route_table_association`
+    - `aws_network_acl`
+
+<br>
+
 ### What's next?
-- Use Terraform to create a separate VPC and subnets inside it while configuring the necessary IGW's, Route Tables etc.
+
 - Create a Bastion server so the database is more secure
 
 <br>

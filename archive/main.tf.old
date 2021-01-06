@@ -1,3 +1,5 @@
+# This is the old .tf file
+# This was the first iteration where no VPCs, subnets etc. were involved
 resource "aws_security_group" "appSG" {
     name = "eng74.jared.SG.app.terraform"
     description = "the security group for the app via terraform"
