@@ -55,6 +55,7 @@
         }
     }
     ```
+- This can also be found in `variables.tf.template`
 
 <br>
 
@@ -189,8 +190,35 @@ resource "aws_instance" "nodejs_instance" {
 
 <br>
 
+### Connecting the database and app instances within Terraform
+- AWS has a built-in provisioner that runs whenever an instance is created, we can use it to connect the database and app
+- Once the database instance is created, we can reference it's private ip and use it to connect the two
+- The code is written below:
+```tf
+resource "aws_instance" "nodejs_instance" {
+    ami = var.ami["app"]
+    instance_type = "t2.micro"
+    associate_public_ip_address = true
+    key_name = var.personal["key"]
+    vpc_security_group_ids = [ aws_security_group.appSG.id ]
+    user_data = <<-EOF
+        #!/bin/bash
+        echo "export DB_HOST=${aws_instance.mongodb_instance.private_ip}" >> /home/ubuntu/.bashrc
+        export DB_HOST=${aws_instance.mongodb_instance.private_ip}
+        source /home/ubuntu/.bashrc
+        cd /home/ubuntu/app
+        pm2 start app.js --update-env
+        pm2 restart app.js --update-env
+        EOF
+    tags = {
+      "Name" = "eng74-jared-terraform-app"
+    }
+}
+```
+
+<br>
+
 ### What's next?
-- Find a way to update the `DB_HOST` environment variable when creating the app instance so that it automatically connects to the newly-created database instance
 - Use Terraform to create a separate VPC and subnets inside it while configuring the necessary IGW's, Route Tables etc.
 - Create a Bastion server so the database is more secure
 

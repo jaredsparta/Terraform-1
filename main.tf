@@ -1,10 +1,3 @@
-# Which cloud provider are we using? Our AMI's are on AWS
-# The AMI's are region-specific so we also need to specify it
-provider "aws" {
-    region = "eu-west-1"
-}
-
-
 resource "aws_security_group" "appSG" {
     name = "eng74.jared.SG.app.terraform"
     description = "the security group for the app via terraform"
@@ -44,7 +37,7 @@ resource "aws_security_group" "dbSG" {
         from_port = 27017
         to_port = 27017
         protocol = "tcp"
-        cidr_blocks = [ aws_security_group.appSG.id ]
+        security_groups = [ aws_security_group.appSG.id ]
     }
 
     ingress {
@@ -65,18 +58,6 @@ resource "aws_security_group" "dbSG" {
 }
 
 
-resource "aws_instance" "nodejs_instance" {
-    ami = var.ami["app"]
-    instance_type = "t2.micro"
-    associate_public_ip_address = true
-    key_name = var.personal["key"]
-    vpc_security_group_ids = [ aws_security_group.appSG.id ]
-    tags = {
-      "Name" = "eng74-jared-terraform-app"
-    }
-}
-
-
 resource "aws_instance" "mongodb_instance" {
     ami = var.ami["db"]
     instance_type = "t2.micro"
@@ -85,5 +66,26 @@ resource "aws_instance" "mongodb_instance" {
     vpc_security_group_ids = [ aws_security_group.dbSG.id ]
     tags = {
       "Name" = "eng74-jared-terraform-db"
+    }
+}
+
+
+resource "aws_instance" "nodejs_instance" {
+    ami = var.ami["app"]
+    instance_type = "t2.micro"
+    associate_public_ip_address = true
+    key_name = var.personal["key"]
+    vpc_security_group_ids = [ aws_security_group.appSG.id ]
+    user_data = <<-EOF
+        #!/bin/bash
+        echo "export DB_HOST=${aws_instance.mongodb_instance.private_ip}" >> /home/ubuntu/.bashrc
+        export DB_HOST=${aws_instance.mongodb_instance.private_ip}
+        source /home/ubuntu/.bashrc
+        cd /home/ubuntu/app
+        pm2 start app.js --update-env
+        pm2 restart app.js --update-env
+        EOF
+    tags = {
+      "Name" = "eng74-jared-terraform-app"
     }
 }
