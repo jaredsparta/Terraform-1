@@ -31,6 +31,16 @@
 - `variables.tf` contains variables used in the the code, to make it more dynamic. You will need to input more variables as mentioned in section 4
 - `template.tpl` details the bash script used to connect the app and database after they are created. This is used with the `templatefile` function and is run on the app instance
 
+- **Quickstart**:
+    - Go to section 4 and add that block of code into `variables.tf`
+    - Change the variables in `variables.tf` to what you desire
+    - Ensure the AWS secret and access keys are in your environment variables(as Terraform looks there by default)
+    - Go into `main.tf` and configure the names, instance types etc. to what you need
+    - `$ terraform init` to load all the modules
+    - `$ terraform validate` to check for syntax errors -- if there are any, you will have to fix them before running
+    - `$ terraform apply` to create the infrastructure
+    - `$ terraform destroy` to destroy the infrastructure
+
 <br>
 
 [Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
@@ -297,12 +307,14 @@ pm2 restart app.js --update-env
 ### VPCs, subnets and more infrastructure
 - We now want to create our own VPC alongside a private and public subnet. We also want to create the necessary infrastructure (route tables, network ACLs etc.)
 
-- The code is split up among several files in `terraform-files`. The resources used were:
+- The code is split up among several files in `archive/terraform-files`. The resources used were:
     - `aws_vpc`
     - `aws_subnet`
     - `aws_internet_gateway`
     - `aws_route_table` and `aws_route_table_association`
     - `aws_network_acl`
+
+- If one looks in `modules/vpc-etc/main.tf` they will see the entire network infrastructure in a single file
 
 <br>
 
@@ -342,12 +354,17 @@ pm2 restart app.js --update-env
 
 - Child modules will inherit the provider from the parent module, so you will need to remove any references to `provider`
 
+- Brief overview:
+    - Each module can have certain input variables, allowing more dynamic declarations. The names of the input variables can be found in the `variables.tf` file within a module
+    - A module can output variables too. When modules are used in other configuration files, the parent module can reference the output of child modules. Such outputs can be found in the `outputs.tf` files within a module
+
 <br>
 
 [Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
 
 ### Modularising code
 - There is a `modules` folder that has a folder called `vpc-etc`. This folder contains a module that will create a VPC alongside public/private subnets, NACLs, route tables, etc.
+    - The folder also contains modules to create an app and database
 
 - To call a module inside a configuration file, use the `module` keyword like shown below:
     - Some modules require variables to be used properly, you will have to pass them values in this declaration
@@ -373,7 +390,7 @@ module "vpc_stuff" {
 }
 ```
 
-- Modules can also output variables for child processes to use. These are defined in `outputs.tf`. To call these variables within a child, use the `module.<identifier>.<name>`
+- Modules can also output variables for parent modules to use. These are defined in `outputs.tf`. To call outputs from child modules, use the `module.<identifier>.<name>`
 
 - For example, suppose we have the following outputs file:
 ```tf
@@ -398,7 +415,7 @@ output "public_security_group_id" {
 }
 ```
 
-- If within the child process we give the module the identifier `vpc_stuff`, one would reference the `private_subnet_id` output in a child with `module.vpc_stuff.private_subnet_id`
+- If within the parent module we give the child module the identifier `vpc_stuff`, one would reference the `private_subnet_id` output from the child module with `module.vpc_stuff.private_subnet_id`
 
 <br>
 
@@ -409,7 +426,6 @@ output "public_security_group_id" {
 - Create a Bastion server so the database is more secure
 
 <br>
-
 
 ---
 ## Used

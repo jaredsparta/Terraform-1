@@ -123,7 +123,7 @@ resource "aws_network_acl" "public_nacl" {
     vpc_id = aws_vpc.vpc.id
     subnet_ids = [aws_subnet.public_subnet.id]
 
-    # Port 80 outbound for everywhere
+    # Ephemeral ports outbound for everywhere
     egress {
         protocol = "tcp"
         rule_no = 110

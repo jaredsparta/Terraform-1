@@ -1,11 +1,3 @@
-variable "instance_types" {
-    type = map
-    default = {
-        "app" = "t2.micro"
-        "db" = "t2.micro"
-    }
-}
-
 variable "cidr_blocks" {
     type = map
     default = {
