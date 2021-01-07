@@ -1,14 +1,15 @@
 # Terraform and AMI's
 
-- This repository keeps the notes for learning Terraform
-
-![](images/diagram.jpg)
+- This repository contains the notes made whilst learning Terraform
+- It details iterations of previous code
+- There are no folders that contain the nodejs app anymore; all the code is now present within an AMI we created using Packer 
 
 <br>
 
 ## Contents
 
 0. [Overview](https://github.com/jaredsparta/Terraform-1#Overview)
+    1. [Quickstart](https://github.com/jaredsparta/Terraform-1#Quickstart)
 1. [What is Terraform](https://github.com/jaredsparta/Terraform-1#What-is-Terraform)
 2. [Why Terraform](https://github.com/jaredsparta/Terraform-1#Why-Terraform)
 3. [Main Commands](https://github.com/jaredsparta/Terraform-1#Main-Commands-and-Overview)
@@ -27,25 +28,29 @@
 ## Overview
 - `archive` details the previous iteration of the code
 - `modules` contains the modules used in the code
-- `main.tf` contains the code used to create the app and database
+- `main.tf` contains the code used to get the app running correctly
 - `variables.tf` contains variables used in the the code, to make it more dynamic. You will need to input more variables as mentioned in section 4
 - `template.tpl` details the bash script used to connect the app and database after they are created. This is used with the `templatefile` function and is run on the app instance
 
-- **Quickstart**:
-    - Go to section 4 and add that block of code into `variables.tf`
-    - Change the variables in `variables.tf` to what you desire
-    - Ensure the AWS secret and access keys are in your environment variables(as Terraform looks there by default)
-    - Go into `main.tf` and configure the names, instance types etc. to what you need
-    - `$ terraform init` to load all the modules
-    - `$ terraform validate` to check for syntax errors -- if there are any, you will have to fix them before running
-    - `$ terraform apply` to create the infrastructure
-    - `$ terraform destroy` to destroy the infrastructure
+
+### Quickstart
+1. Go to section 4 and add that block of code into `variables.tf`
+2. Change the variables in `variables.tf` to what you desire
+3. Ensure the AWS secret and access keys are in your environment variables (as Terraform looks thereby default)
+4. Go into `main.tf` and configure the names, instance types etc. to what you need
+5. `$ terraform init` to load all the modules
+6. `$ terraform validate` to check for syntax errors -- if there are any, you will have to fix them before moving on
+7. `$ terraform apply` to create the infrastructure
+8. `$ terraform destroy` to destroy the infrastructure
 
 <br>
 
 [Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
 
 ## What is Terraform
+
+![](images/diagram.jpg)
+
 - Terraform is a tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.
 - The infrastructure Terraform can manage includes low-level components such as compute instances, storage, and networking, as well as high-level components such as DNS entries, SaaS features, etc.
 - This information was found [here](https://www.terraform.io/intro/index.html)
