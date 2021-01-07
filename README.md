@@ -33,13 +33,17 @@
 
 <br>
 
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
+
 ## What is Terraform
 - Terraform is a tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.
 - The infrastructure Terraform can manage includes low-level components such as compute instances, storage, and networking, as well as high-level components such as DNS entries, SaaS features, etc.
-
-[Source](https://www.terraform.io/intro/index.html)
+- This information was found [here](https://www.terraform.io/intro/index.html)
 
 <br>
+
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
+
 
 ## Why Terraform
 
@@ -48,6 +52,8 @@
 - It is cloud-independent, we can use Terraform for AWS, Azure, etc. 
 
 <br>
+
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
 
 ## Main Commands and Overview
 - As can be seen when typing `terraform -help`, the main commands are:
@@ -66,11 +72,12 @@
 
 <br>
 
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
+
 ## Explanations
 - In the following, the AMI's used are already provisioned to run the app and the database (via Packer and Ansible)
-- The following examples use variables named within a separate `.tf` file. These variables are found in `terraform-files/variables.tf`
-    - I have omitted the AMI ID's as well as my own personal IP address. You would need to add these to that file for Terraform to work entirely
-    - So add the following in that file:
+- The following examples use variables named within a separate `.tf` file. These variables are found in `variables.tf`
+    - I have omitted the AMI ID's as well as my own personal IP address. You would need to add these to that file for Terraform to work entirely. So add the following in that file:
     ```tf
     variable "personal" {
         type = map
@@ -91,6 +98,8 @@
 
 <br>
 
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
+
 ### Terraform to create an EC2 instance
 - One can create EC2 instances using the resource `aws_instance`
 - Documentation can be found [here](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance)
@@ -109,6 +118,8 @@ resource "aws_instance" "nodejs_instance" {
 ```
 
 <br>
+
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
 
 ### Terraform to create Security groups
 - This can be achieved using the resource `aws_security_group`
@@ -146,6 +157,8 @@ resource "aws_security_group" "dbSG" {
 ```
 
 <br>
+
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
 
 ### Variables in Terraform
 - While we can write key-value pairs explicitly, it is always good to provide more dynamic elements
@@ -222,6 +235,8 @@ resource "aws_instance" "nodejs_instance" {
 
 <br>
 
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
+
 ### Connecting the database and app instances within Terraform
 - AWS has a built-in provisioner that runs whenever an instance is created, we can use it to connect the database and app
 - Once the database instance is created, we can reference it's private ip and use it to connect the two
@@ -277,6 +292,8 @@ pm2 restart app.js --update-env
 
 <br>
 
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
+
 ### VPCs, subnets and more infrastructure
 - We now want to create our own VPC alongside a private and public subnet. We also want to create the necessary infrastructure (route tables, network ACLs etc.)
 
@@ -288,6 +305,8 @@ pm2 restart app.js --update-env
     - `aws_network_acl`
 
 <br>
+
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
 
 ### Terraform modules
 - For more complex systems (not necessarily this one), configuration files would get increasingly harder to navigate and updating configuration files would get harder due to possible conflicts with other resources etc.
@@ -324,6 +343,8 @@ pm2 restart app.js --update-env
 - Child modules will inherit the provider from the parent module, so you will need to remove any references to `provider`
 
 <br>
+
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
 
 ### Modularising code
 - There is a `modules` folder that has a folder called `vpc-etc`. This folder contains a module that will create a VPC alongside public/private subnets, NACLs, route tables, etc.
@@ -381,9 +402,7 @@ output "public_security_group_id" {
 
 <br>
 
-[Source](https://learn.hashicorp.com/tutorials/terraform/module)
-
-<br>
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
 
 ### What's next?
 
@@ -391,9 +410,13 @@ output "public_security_group_id" {
 
 <br>
 
+
 ---
 ## Used
 
 1. [Variables in Terraform](https://upcloud.com/community/tutorials/terraform-variables/)
 2. [Outputs in main.tf vs. outputs.tf](https://jmarhee.medium.com/outputs-with-terraform-modules-ec0ce38ea1ad)
 3. [Info on Terraform modules](https://blog.gruntwork.io/how-to-create-reusable-infrastructure-with-terraform-modules-25526d65f73d#ff91)
+4. [More info on modules](https://learn.hashicorp.com/tutorials/terraform/module)
+
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
