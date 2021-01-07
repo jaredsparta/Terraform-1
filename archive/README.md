@@ -1,1 +1,3 @@
 - This folder contains previous iterations of the code
+- `main.tf` is the 1st iteration
+- `terraform-files` is the 2nd iteration

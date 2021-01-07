@@ -1,8 +1,13 @@
-.terraform/*
 .terraform
+*/.terraform
+*/*/.terraform
 .vscode
 terraform*
 */.terraform*
 !terraform-files
 terraform-files/private-variables.tf
 terraform-files/bastion.
+modules/*
+!modules/vpc-etc
+private-variables.tf
+archive/terraform-files/private-variables.tf

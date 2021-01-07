@@ -1,6 +1,35 @@
 # Terraform and AMI's
 
+- This repository keeps the notes for learning Terraform
+
 ![](images/diagram.jpg)
+
+<br>
+
+## Contents
+
+0. [Overview](https://github.com/jaredsparta/Terraform-1#Overview)
+1. [What is Terraform](https://github.com/jaredsparta/Terraform-1#What-is-Terraform)
+2. [Why Terraform](https://github.com/jaredsparta/Terraform-1#Why-Terraform)
+3. [Main Commands](https://github.com/jaredsparta/Terraform-1#Main-Commands-and-Overview)
+4. [Explanations](https://github.com/jaredsparta/Terraform-1#Explanations)
+    1. [EC2 instances](https://github.com/jaredsparta/Terraform-1#Terraform-to-create-an-EC2-instance)
+    2. [Security groups](https://github.com/jaredsparta/Terraform-1#Terraform-to-create-Security-groups)
+    3. [Variables](https://github.com/jaredsparta/Terraform-1#Variables-in-Terraform)
+    4. [Connecting DB and APP](https://github.com/jaredsparta/Terraform-1#Connecting-the-database-and-app-instances-within-Terraform)
+    5. [VPCs and more](https://github.com/jaredsparta/Terraform-1#VPCs-subnets-and-more-infrastructure)
+    6. [Module explanation](https://github.com/jaredsparta/Terraform-1#Terraform-modules)
+    7. [Modularising the code](https://github.com/jaredsparta/Terraform-1#Modularising-code)
+5. [Links](https://github.com/jaredsparta/Terraform-1#Used)
+
+<br>
+
+## Overview
+- `archive` details the previous iteration of the code
+- `modules` contains the modules used in the code
+- `main.tf` contains the code used to create the app and database
+- `variables.tf` contains variables used in the the code, to make it more dynamic. You will need to input more variables as mentioned in section 4
+- `template.tpl` details the bash script used to connect the app and database after they are created. This is used with the `templatefile` function and is run on the app instance
 
 <br>
 
@@ -9,7 +38,6 @@
 - The infrastructure Terraform can manage includes low-level components such as compute instances, storage, and networking, as well as high-level components such as DNS entries, SaaS features, etc.
 
 [Source](https://www.terraform.io/intro/index.html)
-
 
 <br>
 
@@ -21,7 +49,7 @@
 
 <br>
 
-## Main Commands
+## Main Commands and Overview
 - As can be seen when typing `terraform -help`, the main commands are:
     1. `init` - prepares working directory for the other commands
     2. `validate` - checks if the configuration file is valid
@@ -32,9 +60,13 @@
 
 - There are other CLI commands you can use which can be seen using `terraform -help`
 
+- `terraform.tfstate` and `terraform.tfstate.backup` contains the Terraform states. This is how Terraform keeps track of the relationship between your configuration files and the infrastructure it provisions
+
+- `.terraform` is the directory that is created when you `terraform init`. It contains all the modules and plugins used to provision your infrastructure. These are specific to a certain instance of Terraform and not the actual infrastructure. This relates to the configuration files you have.
+
 <br>
 
-## Examples
+## Explanations
 - In the following, the AMI's used are already provisioned to run the app and the database (via Packer and Ansible)
 - The following examples use variables named within a separate `.tf` file. These variables are found in `terraform-files/variables.tf`
     - I have omitted the AMI ID's as well as my own personal IP address. You would need to add these to that file for Terraform to work entirely
@@ -115,7 +147,7 @@ resource "aws_security_group" "dbSG" {
 
 <br>
 
-### A more dynamic Terraform
+### Variables in Terraform
 - While we can write key-value pairs explicitly, it is always good to provide more dynamic elements
 - We can make use of a separate file containing several variables we can call in our Terraform `main.tf`
     - Variables are used via the keyword `var.<name-of-variable>`
@@ -257,6 +289,102 @@ pm2 restart app.js --update-env
 
 <br>
 
+### Terraform modules
+- For more complex systems (not necessarily this one), configuration files would get increasingly harder to navigate and updating configuration files would get harder due to possible conflicts with other resources etc.
+- Using Terraform modules will help with such problems. They:
+    1. Organise configuration files
+    2. Encapsulate configuration files
+    3. Make config files re-usable
+    4. Provide consistency and ensures best practices
+    5. Help reduce errors
+
+- What is a module?
+    - They are basically just a set of configuration files in a single directory. A simple example of a module is:
+    ```shell
+    $ tree minimal-module/
+    .
+    ├── LICENSE
+    ├── README.md
+    ├── main.tf
+    ├── variables.tf
+    ├── outputs.tf
+    ```
+    - If you run terraform commands within this directory, you will not actually use the module but rather the configuration files
+
+- How do we call a module?
+    - When you run terraform commands, terraform will use the configuration files found in the current directory 
+    - Calling modules is as simple as using them within the configuration files of the current directory
+    - When you have a `module` block, terraform will load and process that module and place it within `.terraform` -- whenever you add a new module to the configuration files you will need to `terraform init` to ensure the module is loaded by terraform
+
+- Best practices?
+    - Look at the documentation [https://learn.hashicorp.com/tutorials/terraform/module](https://learn.hashicorp.com/tutorials/terraform/module)
+
+- Ensure you remove `terraform.tfstate`, `terraform.tfstate.backup`, `.terraform` and `*.tfvars`. You do not want to distribute them as part of your module.
+
+- Child modules will inherit the provider from the parent module, so you will need to remove any references to `provider`
+
+<br>
+
+### Modularising code
+- There is a `modules` folder that has a folder called `vpc-etc`. This folder contains a module that will create a VPC alongside public/private subnets, NACLs, route tables, etc.
+
+- To call a module inside a configuration file, use the `module` keyword like shown below:
+    - Some modules require variables to be used properly, you will have to pass them values in this declaration
+    - `vpc_stuff` is the identifier for this module
+
+```tf
+module "vpc_stuff" {
+    source = "./modules/vpc-etc"
+
+    app_security_group_name = "eng74.jared.SG.app.terraform"
+    db_security_group_name = "eng74.jared.SG.db.terraform"
+    vpc_name = "eng74-jared-terraform-vpc"
+    public_subnet_name = "eng74-jared-terraform-public"
+    private_subnet_name = "eng74-jared-terraform-private"
+    igw_name = "eng74-jared-terraform-IGW"
+    public_route_table_name = "eng74-jared-terraform-route-public"
+    private_route_table_name = "eng74-jared-terraform-route-private"
+    aws_key = var.personal["key"]
+    vpc_cidr_block = var.cidr_blocks["vpc"]
+    public_subnet_cidr_block = var.cidr_blocks["public_subnet"]
+    private_subnet_cidr_block = var.cidr_blocks["private_subnet"]
+    personal_ip = var.personal["ip"]
+}
+```
+
+- Modules can also output variables for child processes to use. These are defined in `outputs.tf`. To call these variables within a child, use the `module.<identifier>.<name>`
+
+- For example, suppose we have the following outputs file:
+```tf
+# The outputs from the module
+
+# SUBNET IDs
+output "private_subnet_id" {
+    value = aws_subnet.private_subnet.id
+}
+
+output "public_subnet_id" {
+    value = aws_subnet.public_subnet.id
+}
+
+# SECURITY GROUP IDs
+output "private_security_group_id" {
+    value = aws_security_group.dbSG.id
+}
+
+output "public_security_group_id" {
+    value = aws_security_group.appSG.id
+}
+```
+
+- If within the child process we give the module the identifier `vpc_stuff`, one would reference the `private_subnet_id` output in a child with `module.vpc_stuff.private_subnet_id`
+
+<br>
+
+[Source](https://learn.hashicorp.com/tutorials/terraform/module)
+
+<br>
+
 ### What's next?
 
 - Create a Bastion server so the database is more secure
@@ -264,6 +392,8 @@ pm2 restart app.js --update-env
 <br>
 
 ---
-**Used:**
+## Used
 
 1. [Variables in Terraform](https://upcloud.com/community/tutorials/terraform-variables/)
+2. [Outputs in main.tf vs. outputs.tf](https://jmarhee.medium.com/outputs-with-terraform-modules-ec0ce38ea1ad)
+3. [Info on Terraform modules](https://blog.gruntwork.io/how-to-create-reusable-infrastructure-with-terraform-modules-25526d65f73d#ff91)
