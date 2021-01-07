@@ -3,5 +3,6 @@
 .vscode
 terraform*
 */.terraform*
-*/variables.tf
 !terraform-files
+terraform-files/private-variables.tf
+terraform-files/bastion.

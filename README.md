@@ -36,27 +36,26 @@
 
 ## Examples
 - In the following, the AMI's used are already provisioned to run the app and the database (via Packer and Ansible)
-- The following examples use variables named within a separate `.tf` file. As the variables contain sensitive information (personal IP's etc.) they were omitted. You will have to use the following structure to create your own file:
-    - Create a file named `variables.tf` (it can be named however you want as long as the file extension is `.tf`)
-    - Inside this file write the following:
+- The following examples use variables named within a separate `.tf` file. These variables are found in `terraform-files/variables.tf`
+    - I have omitted the AMI ID's as well as my own personal IP address. You would need to add these to that file for Terraform to work entirely
+    - So add the following in that file:
     ```tf
-    variable "ami" {
-    type = map
-    default = {
-        "app" = "<ami-id>"
-        "db" = "<ami-id>"
-        }
-    }
-
     variable "personal" {
         type = map
         default = {
-            "key" = "<key-name>"
-            "ip" = "<personal-ip>/32"
+            "key" = "key-name"
+            "ip" = "ip-address/32"
+        }
+    }
+
+    variable "ami" {
+        type = map
+        default = {
+            "app" = "ami-id"
+            "db" = "ami-id"
         }
     }
     ```
-- This can also be found in `variables.tf.template`
 
 <br>
 
@@ -204,10 +203,10 @@ resource "aws_instance" "nodejs_instance" {
     vpc_security_group_ids = [ aws_security_group.appSG.id ]
     user_data = <<-EOF
         #!/bin/bash
-        echo "export DB_HOST=${aws_instance.mongodb_instance.private_ip}" >> /home/ubuntu/.bashrc
-        export DB_HOST=${aws_instance.mongodb_instance.private_ip}
-        source /home/ubuntu/.bashrc
+        echo "export DB_HOST=${db-ip}" >> /home/ubuntu/.bashrc
+        export DB_HOST=${db-ip}
         cd /home/ubuntu/app
+        pm2 kill
         pm2 start app.js --update-env
         pm2 restart app.js --update-env
         EOF
@@ -215,6 +214,33 @@ resource "aws_instance" "nodejs_instance" {
       "Name" = "eng74-jared-terraform-app"
     }
 }
+```
+
+- Writing inline is good but if we wanted to create multiple ones, it would be a good idea to create a template file and just call it whilst passing the required variables to it
+```tf
+resource "aws_instance" "nodejs_instance" {
+    ami = var.ami["app"]
+    subnet_id = aws_subnet.public_subnet.id
+    instance_type = var.instance_types["app"]
+    associate_public_ip_address = true
+    key_name = var.personal["key"]
+    vpc_security_group_ids = [aws_security_group.appSG.id]
+    user_data = templatefile("./template.tpl", { db-ip = aws_instance.mongodb_instance.private_ip })
+    tags = {
+      "Name" = "eng74-jared-terraform-app"
+    }
+}
+```
+
+- This is a cleaner version and we call a template which has this structure:
+```tf
+#!/bin/bash
+echo "export DB_HOST=${db-ip}" >> /home/ubuntu/.bashrc
+export DB_HOST=${db-ip}
+cd /home/ubuntu/app
+pm2 kill
+pm2 start app.js --update-env
+pm2 restart app.js --update-env
 ```
 
 <br>

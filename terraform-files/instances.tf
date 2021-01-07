@@ -21,16 +21,12 @@ resource "aws_instance" "nodejs_instance" {
     associate_public_ip_address = true
     key_name = var.personal["key"]
     vpc_security_group_ids = [aws_security_group.appSG.id]
-    user_data = <<-EOF
-        #!/bin/bash
-        echo "export DB_HOST=${aws_instance.mongodb_instance.private_ip}" >> /home/ubuntu/.bashrc
-        export DB_HOST=${aws_instance.mongodb_instance.private_ip}
-        source /home/ubuntu/.bashrc
-        cd /home/ubuntu/app
-        pm2 start app.js --update-env
-        pm2 restart app.js --update-env
-        EOF
+    user_data = templatefile("./template.tpl", { db-ip = aws_instance.mongodb_instance.private_ip })
     tags = {
       "Name" = "eng74-jared-terraform-app"
     }
+}
+
+output "test" {
+  value = templatefile("./template.tpl", { db-ip = aws_instance.mongodb_instance.private_ip })
 }
