@@ -5,5 +5,5 @@ cd /home/ubuntu/app
 pm2 kill
 rm -r node_modules
 npm install
+npm run seed
 pm2 start app.js --update-env
-pm2 restart app.js --update-env

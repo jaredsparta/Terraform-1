@@ -1,4 +1,4 @@
-# NAMES
+# DATABASE VARIABLES
 variable "db_name" {
     description = "Name of the db"
 }

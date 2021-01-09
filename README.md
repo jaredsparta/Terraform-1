@@ -21,6 +21,7 @@
     5. [VPCs and more](https://github.com/jaredsparta/Terraform-1#VPCs-subnets-and-more-infrastructure)
     6. [Module explanation](https://github.com/jaredsparta/Terraform-1#Terraform-modules)
     7. [Modularising the code](https://github.com/jaredsparta/Terraform-1#Modularising-code)
+    8. [Load balancing and auto scaling](https://github.com/jaredsparta/Terraform-1#Load-balancing-and-auto-scaling)
 5. [Links](https://github.com/jaredsparta/Terraform-1#Used)
 
 <br>
@@ -422,6 +423,28 @@ output "public_security_group_id" {
 ```
 
 - If within the parent module we give the child module the identifier `vpc_stuff`, one would reference the `private_subnet_id` output from the child module with `module.vpc_stuff.private_subnet_id`
+
+<br>
+
+[Back to top](https://github.com/jaredsparta/Terraform-1#Contents)
+
+### Load balancing and auto scaling
+- The next iteration uses an auto scaling group and a load balancer to distribute app requests efficiently
+- A module found in `modules/auto-scaling` provides the necessary infrastructure to be able to deploy a group of EC2 instances all running identical copies of the app
+- A simple diagram to explain would be:
+    ![](images/diagram2.jpg)
+    
+    - Instances within the auto scale group are able to access the database
+    - The database has no access to the internet
+
+- Modules used:
+    - `aws_lb`
+    - `aws_lb_target_group`
+    - `aws_launch_configuration`
+    - `aws_autoscaling_group`
+
+- Notice that we no longer use the `app` module
+    - We configure the instances in the auto scale group using user data passed in the launch configuration
 
 <br>
 

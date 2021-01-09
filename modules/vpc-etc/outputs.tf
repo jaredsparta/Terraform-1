@@ -17,3 +17,8 @@ output "private_security_group_id" {
 output "public_security_group_id" {
     value = aws_security_group.appSG.id
 }
+
+# VPC ID
+output "vpc_id" {
+    value = aws_vpc.vpc.id
+}

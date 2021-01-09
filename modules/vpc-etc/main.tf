@@ -122,6 +122,9 @@ resource "aws_security_group" "dbSG" {
 resource "aws_network_acl" "public_nacl" {
     vpc_id = aws_vpc.vpc.id
     subnet_ids = [aws_subnet.public_subnet.id]
+    tags = {
+        "Name" = var.public_nacl_name
+    }
 
     # Ephemeral ports outbound for everywhere
     egress {
@@ -199,6 +202,9 @@ resource "aws_network_acl" "public_nacl" {
 resource "aws_network_acl" "private_nacl" {
     vpc_id = aws_vpc.vpc.id
     subnet_ids = [aws_subnet.private_subnet.id]
+    tags = {
+        "Name" = var.private_nacl_name
+    }
 
     # Port 80 outbound to public subnet
     egress {
