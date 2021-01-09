@@ -3,7 +3,7 @@ provider "aws" {
     region = "eu-west-1"
 }
 
-# Creates the network topology etc.
+# Creates the VPC, subnets etc.
 module "vpc_stuff" {
     source = "./modules/vpc-etc"
 
