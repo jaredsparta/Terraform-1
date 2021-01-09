@@ -5,14 +5,15 @@
 
 <br>
 
-## `terraform-files` is the 2nd iteration
+## `terraform-files/` is the 2nd iteration
 - An app and database running in separate subnets within a newly-created VPC
 - Safety is handled at the VPC, subnet(NACLs) and security group level for the database
 - Structure at this stage is:
+
     ![](images/diagram1.jpg)
 
 <br>
 
-## `main-iteration-three.tf`is the third iteration 
+## `main-iteration-three.tf`is the 3rd iteration 
 - This is the previous iteration but modularised. It therefore has the same structure.
 - This makes use of the `app`, `db` and `vpc-etc` modules found in `modules`

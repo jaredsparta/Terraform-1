@@ -37,7 +37,7 @@
 ### Quickstart
 1. Go to section 4 [here](https://github.com/jaredsparta/Terraform-1#Explanations) and add that block of code into `variables.tf`
     - If you are going to be putting anything on GitHub, then I suggest creating another `private-variables.tf` file, inserting that block of code in there and putting that file into `.gitignore`
-2. Change the variables in `variables.tf` to what you desire
+2. Change the variables in `variables.tf` to what you need
 3. Ensure the AWS secret and access keys are in your environment variables (as Terraform looks there by default)
 4. Go into `main.tf` and configure the names, instance types etc. to what you need
 5. `$ terraform init` to load all the modules
